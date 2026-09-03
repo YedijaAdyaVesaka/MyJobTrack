@@ -37,14 +37,22 @@ export function LamaranTable({ data }: LamaranTableProps) {
   async function handleDelete(id: string) {
     if (!confirm("Yakin ingin menghapus lamaran ini?")) return;
     setDeleting(id);
-    await deleteApplication(id);
-    router.refresh();
+    const res = await deleteApplication(id);
+    if (!res.success) {
+      alert(res.error || "Gagal menghapus lamaran.");
+    } else {
+      router.refresh();
+    }
     setDeleting(null);
   }
 
   async function handleStatusChange(id: string, status: JobStatus) {
-    await updateApplicationStatus(id, status);
-    router.refresh();
+    const res = await updateApplicationStatus(id, status);
+    if (!res.success) {
+      alert(res.error || "Gagal mengubah status lamaran.");
+    } else {
+      router.refresh();
+    }
   }
 
   return (

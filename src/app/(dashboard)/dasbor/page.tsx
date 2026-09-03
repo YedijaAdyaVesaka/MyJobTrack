@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { StatusBadge } from "@/components/ui/status-badge";
+import { DasborGreeting } from "@/components/dasbor-greeting";
 
 export const dynamic = "force-dynamic";
 
@@ -42,12 +43,7 @@ export default async function DasborPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Dasbor</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Selamat datang! Berikut ringkasan lamaran kamu.
-        </p>
-      </div>
+      <DasborGreeting />
 
       {/* Stat Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

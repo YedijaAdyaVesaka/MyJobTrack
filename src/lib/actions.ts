@@ -47,15 +47,19 @@ export async function createApplication(formData: FormData): Promise<{ success: 
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return { success: false, error: "Sesi kamu telah berakhir. Silakan login kembali." };
 
-    const company_name = formData.get("company_name") as string;
-    const position = formData.get("position") as string;
-    const location = (formData.get("location") as string) || null;
-    const applied_date = formData.get("applied_date") as string;
+    const company_name = (formData.get("company_name") as string || "").trim();
+    const position = (formData.get("position") as string || "").trim();
+    const location = (formData.get("location") as string || "").trim() || null;
+    const applied_date = (formData.get("applied_date") as string || "").trim();
     const status = (formData.get("status") as JobStatus) || "applied";
-    const source = (formData.get("source") as string) || null;
-    let job_url = (formData.get("job_url") as string) || null;
-    const salary_range = (formData.get("salary_range") as string) || null;
-    const notes = (formData.get("notes") as string) || null;
+    const source = (formData.get("source") as string || "").trim() || null;
+    let job_url = (formData.get("job_url") as string || "").trim() || null;
+    const salary_range = (formData.get("salary_range") as string || "").trim() || null;
+    const notes = (formData.get("notes") as string || "").trim() || null;
+
+    if (!company_name || !position || !applied_date) {
+      return { success: false, error: "Nama Perusahaan, Posisi, dan Tanggal Melamar wajib diisi." };
+    }
 
     if (job_url && !job_url.startsWith("http://") && !job_url.startsWith("https://")) {
       job_url = `https://${job_url}`;
@@ -90,15 +94,19 @@ export async function updateApplication(id: string, formData: FormData): Promise
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return { success: false, error: "Sesi kamu telah berakhir. Silakan login kembali." };
 
-    const company_name = formData.get("company_name") as string;
-    const position = formData.get("position") as string;
-    const location = (formData.get("location") as string) || null;
-    const applied_date = formData.get("applied_date") as string;
+    const company_name = (formData.get("company_name") as string || "").trim();
+    const position = (formData.get("position") as string || "").trim();
+    const location = (formData.get("location") as string || "").trim() || null;
+    const applied_date = (formData.get("applied_date") as string || "").trim();
     const status = formData.get("status") as JobStatus;
-    const source = (formData.get("source") as string) || null;
-    let job_url = (formData.get("job_url") as string) || null;
-    const salary_range = (formData.get("salary_range") as string) || null;
-    const notes = (formData.get("notes") as string) || null;
+    const source = (formData.get("source") as string || "").trim() || null;
+    let job_url = (formData.get("job_url") as string || "").trim() || null;
+    const salary_range = (formData.get("salary_range") as string || "").trim() || null;
+    const notes = (formData.get("notes") as string || "").trim() || null;
+
+    if (!company_name || !position || !applied_date) {
+      return { success: false, error: "Nama Perusahaan, Posisi, dan Tanggal Melamar wajib diisi." };
+    }
 
     if (job_url && !job_url.startsWith("http://") && !job_url.startsWith("https://")) {
       job_url = `https://${job_url}`;

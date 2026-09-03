@@ -17,15 +17,21 @@ export function KanbanBoard({ initialApplications }: { initialApplications: JobA
 
   async function moveStatus(id: string, status: JobStatus) {
     setApps((prev) => prev.map((a) => (a.id === id ? { ...a, status } : a)));
-    try { await updateApplicationStatus(id, status); }
-    catch { setApps(initialApplications); }
+    const res = await updateApplicationStatus(id, status);
+    if (!res.success) {
+      setApps(initialApplications);
+      alert(res.error || "Gagal mengubah status lamaran.");
+    }
   }
 
   async function handleDelete(id: string) {
     if (!confirm("Hapus lamaran ini?")) return;
     setApps((prev) => prev.filter((a) => a.id !== id));
-    try { await deleteApplication(id); }
-    catch { setApps(initialApplications); }
+    const res = await deleteApplication(id);
+    if (!res.success) {
+      setApps(initialApplications);
+      alert(res.error || "Gagal menghapus lamaran.");
+    }
   }
 
   return (
