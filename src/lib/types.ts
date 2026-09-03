@@ -30,12 +30,12 @@ export const STATUS_OPTIONS: { value: JobStatus; label: string }[] = [
 ];
 
 export const STATUS_COLORS: Record<JobStatus, string> = {
-  applied: "bg-blue-100 text-blue-900 border-blue-300 dark:bg-blue-950/80 dark:text-blue-200 dark:border-blue-800",
-  screening: "bg-indigo-100 text-indigo-900 border-indigo-300 dark:bg-indigo-950/80 dark:text-indigo-200 dark:border-indigo-800",
-  interview: "bg-amber-100 text-amber-950 border-amber-300 dark:bg-amber-950/80 dark:text-amber-200 dark:border-amber-800",
-  offer: "bg-emerald-100 text-emerald-950 border-emerald-300 dark:bg-emerald-950/80 dark:text-emerald-200 dark:border-emerald-800",
-  accepted: "bg-green-100 text-green-950 border-green-300 dark:bg-green-950/80 dark:text-green-200 dark:border-green-800",
-  rejected: "bg-rose-100 text-rose-950 border-rose-300 dark:bg-rose-950/80 dark:text-rose-200 dark:border-rose-800",
+  applied: "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-950/90 dark:text-blue-400 dark:border-blue-800/60",
+  screening: "bg-indigo-100 text-indigo-800 border-indigo-200 dark:bg-indigo-950/90 dark:text-indigo-400 dark:border-indigo-800/60",
+  interview: "bg-amber-100 text-amber-900 border-amber-200 dark:bg-amber-950/90 dark:text-amber-400 dark:border-amber-800/60",
+  offer: "bg-emerald-100 text-emerald-900 border-emerald-200 dark:bg-emerald-950/90 dark:text-emerald-400 dark:border-emerald-800/60",
+  accepted: "bg-green-100 text-green-900 border-green-200 dark:bg-green-950/90 dark:text-green-400 dark:border-green-800/60",
+  rejected: "bg-rose-100 text-rose-900 border-rose-200 dark:bg-rose-950/90 dark:text-rose-400 dark:border-rose-800/60",
 };
 
 export const SOURCE_OPTIONS = [
