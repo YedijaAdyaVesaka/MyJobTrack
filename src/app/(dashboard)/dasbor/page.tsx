@@ -46,42 +46,42 @@ export default async function DasborPage() {
       <DasborGreeting />
 
       {/* Stat Cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         {stats.map((s) => (
-          <div key={s.label} className={`rounded-2xl border bg-gradient-to-br ${s.gradient} p-5 shadow-sm transition-shadow hover:shadow-md`}>
+          <div key={s.label} className={`rounded-2xl border bg-gradient-to-br ${s.gradient} p-4 sm:p-5 shadow-sm transition-shadow hover:shadow-md`}>
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-muted-foreground">{s.label}</span>
-              <div className={`rounded-xl p-2 bg-background/60 ${s.iconColor}`}>
-                <s.icon className="h-4 w-4" />
+              <span className="text-xs sm:text-sm font-medium text-muted-foreground truncate">{s.label}</span>
+              <div className={`rounded-xl p-1.5 sm:p-2 bg-background/60 ${s.iconColor} shrink-0`}>
+                <s.icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               </div>
             </div>
-            <p className="mt-3 text-3xl font-bold tabular-nums tracking-tight">{s.value}</p>
+            <p className="mt-2 sm:mt-3 text-2xl sm:text-3xl font-bold tabular-nums tracking-tight">{s.value}</p>
           </div>
         ))}
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">
         {/* Recent Applications */}
-        <div className="lg:col-span-2 rounded-2xl border bg-card p-6 shadow-sm">
-          <div className="flex items-center justify-between mb-5">
-            <h2 className="text-lg font-semibold">Lamaran Terbaru</h2>
+        <div className="lg:col-span-2 rounded-2xl border bg-card p-4 sm:p-6 shadow-sm">
+          <div className="flex items-center justify-between mb-4 sm:mb-5">
+            <h2 className="text-base sm:text-lg font-semibold">Lamaran Terbaru</h2>
             <Link href="/lamaran" className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline">
               Lihat semua <ArrowUpRight className="h-3 w-3" />
             </Link>
           </div>
           {recent.length === 0 ? (
-            <div className="flex h-40 items-center justify-center rounded-xl border border-dashed text-muted-foreground text-sm">
+            <div className="flex h-36 items-center justify-center rounded-xl border border-dashed text-muted-foreground text-xs sm:text-sm text-center px-4">
               Belum ada lamaran. Mulai tambahkan lamaran pertamamu!
             </div>
           ) : (
             <div className="space-y-1">
               {recent.map((app) => (
-                <div key={app.id} className="flex items-center justify-between rounded-xl px-3 py-3 hover:bg-muted/50 transition-colors">
+                <div key={app.id} className="flex flex-col sm:flex-row sm:items-center justify-between rounded-xl px-3 py-2.5 hover:bg-muted/50 transition-colors gap-2 sm:gap-0">
                   <div>
-                    <p className="font-medium text-sm">{app.company_name}</p>
+                    <p className="font-semibold text-sm">{app.company_name}</p>
                     <p className="text-xs text-muted-foreground">{app.position}</p>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-between sm:justify-end gap-3">
                     <StatusBadge status={app.status} />
                     <span className="text-xs text-muted-foreground whitespace-nowrap tabular-nums">
                       {new Date(app.applied_date).toLocaleDateString("id-ID", { day: "numeric", month: "short" })}

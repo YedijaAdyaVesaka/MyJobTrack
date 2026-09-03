@@ -42,13 +42,17 @@ export function KanbanBoard({ initialApplications }: { initialApplications: JobA
         <p className="text-sm text-muted-foreground mt-1">Pantau & kelola alur tahapan lamaran kamu.</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 items-start overflow-x-auto pb-4">
+      {/* Mobile-optimized Kanban grid with swipe snapping */}
+      <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 md:overflow-visible items-start">
         {columns.map((colKey) => {
           const info = STATUS_OPTIONS.find((s) => s.value === colKey);
           const colApps = apps.filter((a) => a.status === colKey);
 
           return (
-            <div key={colKey} className="flex flex-col rounded-2xl border bg-muted/20 min-w-[240px] min-h-[460px] overflow-hidden">
+            <div
+              key={colKey}
+              className="flex flex-col rounded-2xl border bg-muted/20 w-[85vw] max-w-[300px] shrink-0 snap-center md:w-auto md:max-w-none md:shrink min-h-[460px] overflow-hidden"
+            >
               <div className="flex items-center justify-between px-3.5 py-3 border-b border-border/60 bg-card/50">
                 <div className="flex items-center gap-2">
                   <span className={cn("h-2 w-2 rounded-full", STATUS_COLORS[colKey].split(" ")[0])} />
