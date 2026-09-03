@@ -5,99 +5,162 @@ import { revalidatePath } from "next/cache";
 import type { JobApplication, JobStatus } from "@/lib/types";
 
 export async function getApplications(): Promise<JobApplication[]> {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("job_applications")
-    .select("*")
-    .eq("is_deleted", false)
-    .order("applied_date", { ascending: false });
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("job_applications")
+      .select("*")
+      .eq("is_deleted", false)
+      .order("applied_date", { ascending: false });
 
-  if (error) throw new Error(error.message);
-  return data ?? [];
+    if (error) {
+      console.error("Error fetching applications:", error);
+      return [];
+    }
+    return data ?? [];
+  } catch (err) {
+    console.error("Exception fetching applications:", err);
+    return [];
+  }
 }
 
 export async function getApplicationById(id: string): Promise<JobApplication | null> {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("job_applications")
-    .select("*")
-    .eq("id", id)
-    .eq("is_deleted", false)
-    .single();
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("job_applications")
+      .select("*")
+      .eq("id", id)
+      .eq("is_deleted", false)
+      .single();
 
-  if (error) return null;
-  return data;
+    if (error) return null;
+    return data;
+  } catch {
+    return null;
+  }
 }
 
-export async function createApplication(formData: FormData) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error("Unauthorized");
+export async function createApplication(formData: FormData): Promise<{ success: boolean; error?: string }> {
+  try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { success: false, error: "Sesi kamu telah berakhir. Silakan login kembali." };
 
-  const { error } = await supabase.from("job_applications").insert({
-    user_id: user.id,
-    company_name: formData.get("company_name") as string,
-    position: formData.get("position") as string,
-    location: (formData.get("location") as string) || null,
-    applied_date: formData.get("applied_date") as string,
-    status: (formData.get("status") as JobStatus) || "applied",
-    source: (formData.get("source") as string) || null,
-    job_url: (formData.get("job_url") as string) || null,
-    salary_range: (formData.get("salary_range") as string) || null,
-    notes: (formData.get("notes") as string) || null,
-  });
+    const company_name = formData.get("company_name") as string;
+    const position = formData.get("position") as string;
+    const location = (formData.get("location") as string) || null;
+    const applied_date = formData.get("applied_date") as string;
+    const status = (formData.get("status") as JobStatus) || "applied";
+    const source = (formData.get("source") as string) || null;
+    let job_url = (formData.get("job_url") as string) || null;
+    const salary_range = (formData.get("salary_range") as string) || null;
+    const notes = (formData.get("notes") as string) || null;
 
-  if (error) throw new Error(error.message);
-  revalidatePath("/lamaran");
-  revalidatePath("/dasbor");
+    if (job_url && !job_url.startsWith("http://") && !job_url.startsWith("https://")) {
+      job_url = `https://${job_url}`;
+    }
+
+    const { error } = await supabase.from("job_applications").insert({
+      user_id: user.id,
+      company_name,
+      position,
+      location,
+      applied_date,
+      status,
+      source,
+      job_url,
+      salary_range,
+      notes,
+    });
+
+    if (error) return { success: false, error: error.message };
+
+    revalidatePath("/lamaran");
+    revalidatePath("/dasbor");
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message || "Gagal menambah lamaran." };
+  }
 }
 
-export async function updateApplication(id: string, formData: FormData) {
-  const supabase = await createClient();
+export async function updateApplication(id: string, formData: FormData): Promise<{ success: boolean; error?: string }> {
+  try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { success: false, error: "Sesi kamu telah berakhir. Silakan login kembali." };
 
-  const { error } = await supabase
-    .from("job_applications")
-    .update({
-      company_name: formData.get("company_name") as string,
-      position: formData.get("position") as string,
-      location: (formData.get("location") as string) || null,
-      applied_date: formData.get("applied_date") as string,
-      status: formData.get("status") as JobStatus,
-      source: (formData.get("source") as string) || null,
-      job_url: (formData.get("job_url") as string) || null,
-      salary_range: (formData.get("salary_range") as string) || null,
-      notes: (formData.get("notes") as string) || null,
-    })
-    .eq("id", id);
+    const company_name = formData.get("company_name") as string;
+    const position = formData.get("position") as string;
+    const location = (formData.get("location") as string) || null;
+    const applied_date = formData.get("applied_date") as string;
+    const status = formData.get("status") as JobStatus;
+    const source = (formData.get("source") as string) || null;
+    let job_url = (formData.get("job_url") as string) || null;
+    const salary_range = (formData.get("salary_range") as string) || null;
+    const notes = (formData.get("notes") as string) || null;
 
-  if (error) throw new Error(error.message);
-  revalidatePath("/lamaran");
-  revalidatePath("/dasbor");
+    if (job_url && !job_url.startsWith("http://") && !job_url.startsWith("https://")) {
+      job_url = `https://${job_url}`;
+    }
+
+    const { error } = await supabase
+      .from("job_applications")
+      .update({
+        company_name,
+        position,
+        location,
+        applied_date,
+        status,
+        source,
+        job_url,
+        salary_range,
+        notes,
+      })
+      .eq("id", id);
+
+    if (error) return { success: false, error: error.message };
+
+    revalidatePath("/lamaran");
+    revalidatePath("/dasbor");
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message || "Gagal mengubah lamaran." };
+  }
 }
 
-export async function deleteApplication(id: string) {
-  const supabase = await createClient();
+export async function deleteApplication(id: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    const supabase = await createClient();
+    const { error } = await supabase
+      .from("job_applications")
+      .update({ is_deleted: true })
+      .eq("id", id);
 
-  // Soft delete
-  const { error } = await supabase
-    .from("job_applications")
-    .update({ is_deleted: true })
-    .eq("id", id);
+    if (error) return { success: false, error: error.message };
 
-  if (error) throw new Error(error.message);
-  revalidatePath("/lamaran");
-  revalidatePath("/dasbor");
+    revalidatePath("/lamaran");
+    revalidatePath("/dasbor");
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message || "Gagal menghapus lamaran." };
+  }
 }
 
-export async function updateApplicationStatus(id: string, status: JobStatus) {
-  const supabase = await createClient();
+export async function updateApplicationStatus(id: string, status: JobStatus): Promise<{ success: boolean; error?: string }> {
+  try {
+    const supabase = await createClient();
+    const { error } = await supabase
+      .from("job_applications")
+      .update({ status })
+      .eq("id", id);
 
-  const { error } = await supabase
-    .from("job_applications")
-    .update({ status })
-    .eq("id", id);
+    if (error) return { success: false, error: error.message };
 
-  if (error) throw new Error(error.message);
-  revalidatePath("/lamaran");
-  revalidatePath("/dasbor");
+    revalidatePath("/lamaran");
+    revalidatePath("/dasbor");
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message || "Gagal mengubah status lamaran." };
+  }
 }

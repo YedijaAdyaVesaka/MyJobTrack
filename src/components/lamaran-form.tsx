@@ -100,14 +100,18 @@ export function LamaranForm({ open, onOpenChange, initialData }: LamaranFormProp
     try {
       const form = e.currentTarget;
       const fd = new FormData(form);
-      if (initialData) {
-        await updateApplication(initialData.id, fd);
-      } else {
-        await createApplication(fd);
+      const res = initialData
+        ? await updateApplication(initialData.id, fd)
+        : await createApplication(fd);
+
+      if (!res.success) {
+        setError(res.error || "Terjadi kesalahan saat menyimpan data.");
+        return;
       }
+
       onOpenChange(false);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Terjadi kesalahan");
+    } catch (err: any) {
+      setError(err.message || "Terjadi kesalahan");
     } finally {
       setLoading(false);
     }
@@ -171,7 +175,7 @@ export function LamaranForm({ open, onOpenChange, initialData }: LamaranFormProp
 
         <div className="space-y-1.5">
           <Label htmlFor="job_url">URL Lowongan</Label>
-          <Input id="job_url" name="job_url" type="url" placeholder="https://..." defaultValue={initialData?.job_url ?? ""} />
+          <Input id="job_url" name="job_url" type="text" placeholder="https://..." defaultValue={initialData?.job_url ?? ""} />
         </div>
 
         <div className="space-y-1.5">
