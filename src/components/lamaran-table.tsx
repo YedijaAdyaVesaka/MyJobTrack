@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { Plus, Pencil, Trash2, ExternalLink, ChevronDown, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select } from "@/components/ui/select";
 import { LamaranForm } from "@/components/lamaran-form";
 import { deleteApplication, updateApplicationStatus } from "@/lib/actions";
 import type { JobApplication, JobStatus } from "@/lib/types";
@@ -49,7 +48,7 @@ function StatusDropdown({ status, onChange }: { status: JobStatus; onChange: (s:
       </button>
 
       {open && (
-        <div className="absolute right-0 sm:left-0 z-50 mt-1.5 w-44 rounded-xl border bg-popover/95 backdrop-blur-md p-1 shadow-xl ring-1 ring-black/5 animate-in fade-in-0 zoom-in-95">
+        <div className="absolute right-0 sm:left-0 z-50 mt-1.5 w-44 rounded-xl border bg-popover text-popover-foreground shadow-xl ring-1 ring-border p-1 animate-in fade-in-0 zoom-in-95 dark:bg-zinc-900 dark:border-zinc-800">
           {STATUS_OPTIONS.map((opt) => {
             const isSelected = opt.value === status;
             const badgeColor = STATUS_COLORS[opt.value];
@@ -62,8 +61,10 @@ function StatusDropdown({ status, onChange }: { status: JobStatus; onChange: (s:
                   setOpen(false);
                 }}
                 className={cn(
-                  "flex w-full items-center justify-between px-2.5 py-1.5 text-xs font-semibold rounded-lg transition-colors",
-                  isSelected ? "bg-accent text-accent-foreground font-bold" : "hover:bg-muted text-popover-foreground"
+                  "flex w-full items-center justify-between px-2.5 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer",
+                  isSelected
+                    ? "bg-accent text-accent-foreground font-bold"
+                    : "hover:bg-muted text-foreground dark:hover:bg-zinc-800"
                 )}
               >
                 <div className="flex items-center gap-2">
@@ -85,68 +86,109 @@ export function LamaranTable({ data }: LamaranTableProps) {
   const [formOpen, setFormOpen] = React.useState(false);
   const [editItem, setEditItem] = React.useState<JobApplication | null>(null);
   const [search, setSearch] = React.useState("");
-  const [filterStatus, setFilterStatus] = React.useState("all");
+  const [filterStatus, setFilterStatus] = React.useState<string>("all");
   const [deleting, setDeleting] = React.useState<string | null>(null);
 
-  const filtered = data.filter((d) => {
-    const q = search.toLowerCase();
+  const filtered = data.filter((app) => {
     const matchSearch =
-      !q ||
-      d.company_name.toLowerCase().includes(q) ||
-      d.position.toLowerCase().includes(q) ||
-      (d.location && d.location.toLowerCase().includes(q));
-    const matchStatus = filterStatus === "all" || d.status === filterStatus;
+      app.company_name.toLowerCase().includes(search.toLowerCase()) ||
+      app.position.toLowerCase().includes(search.toLowerCase());
+    const matchStatus = filterStatus === "all" || app.status === filterStatus;
     return matchSearch && matchStatus;
   });
 
   async function handleDelete(id: string) {
-    if (!confirm("Yakin ingin menghapus lamaran ini?")) return;
+    if (!confirm("Apakah Anda yakin ingin menghapus lamaran ini?")) return;
     setDeleting(id);
-    const res = await deleteApplication(id);
-    if (!res.success) {
-      alert(res.error || "Gagal menghapus lamaran.");
-    } else {
-      router.refresh();
+    try {
+      const res = await deleteApplication(id);
+      if (res.success) {
+        router.refresh();
+      } else {
+        alert(res.error || "Gagal menghapus");
+      }
+    } finally {
+      setDeleting(null);
     }
-    setDeleting(null);
   }
 
   async function handleStatusChange(id: string, status: JobStatus) {
     const res = await updateApplicationStatus(id, status);
     if (!res.success) {
-      alert(res.error || "Gagal mengubah status lamaran.");
-    } else {
-      router.refresh();
+      alert(res.error || "Gagal mengubah status");
+      return;
     }
+    router.refresh();
   }
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-2">
-          <Input placeholder="Cari perusahaan atau posisi..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full sm:w-64" />
-          <Select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="w-full sm:w-44">
-            <option value="all">Semua Status</option>
-            {STATUS_OPTIONS.map((s) => (
-              <option key={s.value} value={s.value}>{s.label}</option>
-            ))}
-          </Select>
+      {/* Filter and Search Bar */}
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          <Input
+            placeholder="Cari perusahaan atau posisi..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full sm:w-72"
+          />
+          <Button onClick={() => { setEditItem(null); setFormOpen(true); }} className="shrink-0">
+            <Plus className="h-4 w-4 mr-1.5" /> Tambah Lamaran
+          </Button>
         </div>
-        <Button onClick={() => { setEditItem(null); setFormOpen(true); }}>
-          <Plus className="h-4 w-4" /> Tambah Lamaran
-        </Button>
+
+        {/* Filter Pills (no dropdown) */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1.5 no-scrollbar -mx-1 px-1">
+          <button
+            type="button"
+            onClick={() => setFilterStatus("all")}
+            className={cn(
+              "px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all border cursor-pointer shrink-0",
+              filterStatus === "all"
+                ? "bg-primary text-primary-foreground border-primary shadow-xs font-bold"
+                : "bg-muted/50 text-muted-foreground border-transparent hover:bg-muted"
+            )}
+          >
+            Semua ({data.length})
+          </button>
+          {STATUS_OPTIONS.map((s) => {
+            const isSelected = filterStatus === s.value;
+            const colorClass = STATUS_COLORS[s.value];
+            const count = data.filter((item) => item.status === s.value).length;
+            return (
+              <button
+                key={s.value}
+                type="button"
+                onClick={() => setFilterStatus(s.value)}
+                className={cn(
+                  "px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all border cursor-pointer shrink-0 inline-flex items-center gap-1.5",
+                  isSelected
+                    ? cn(colorClass, "shadow-xs ring-1 ring-primary/40 font-bold")
+                    : "bg-card text-muted-foreground border-border hover:bg-muted"
+                )}
+              >
+                <span className={cn("h-1.5 w-1.5 rounded-full", isSelected ? "bg-current" : "bg-muted-foreground/40")} />
+                {s.label} ({count})
+              </button>
+            );
+          })}
+        </div>
       </div>
+
       {/* View Konten: Mobile Cards (< md) & Table Desktop (>= md) */}
       {filtered.length === 0 ? (
-        <div className="rounded-xl border bg-card p-12 shadow-sm flex flex-col items-center justify-center text-muted-foreground text-sm gap-2">
-          {data.length === 0
-            ? "Belum ada lamaran. Klik tombol di atas untuk menambahkan!"
-            : "Tidak ada lamaran yang cocok."}
+        <div className="rounded-xl border bg-card p-12 shadow-sm flex flex-col items-center justify-center text-center">
+          <p className="text-muted-foreground">Tidak ada lamaran yang ditemukan.</p>
+          {(search || filterStatus !== "all") && (
+            <Button variant="link" onClick={() => { setSearch(""); setFilterStatus("all"); }} className="mt-2 text-xs">
+              Reset filter
+            </Button>
+          )}
         </div>
       ) : (
         <>
-          {/* Mobile Card View */}
-          <div className="grid grid-cols-1 gap-3 md:hidden">
+          {/* Mobile View: Cards Layout */}
+          <div className="grid gap-3 md:hidden">
             {filtered.map((app) => (
               <MobileCard
                 key={app.id}
@@ -154,43 +196,59 @@ export function LamaranTable({ data }: LamaranTableProps) {
                 deleting={deleting}
                 onDelete={handleDelete}
                 onStatusChange={handleStatusChange}
-                onEdit={(a) => { setEditItem(a); setFormOpen(true); }}
+                onEdit={(a) => {
+                  setEditItem(a);
+                  setFormOpen(true);
+                }}
               />
             ))}
           </div>
 
-          {/* Desktop Table View */}
-          <div className="hidden md:block rounded-xl border bg-card shadow-sm overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b bg-muted/50 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  <th className="px-4 py-3">Perusahaan</th>
-                  <th className="px-4 py-3">Posisi</th>
-                  <th className="px-4 py-3">Lokasi</th>
-                  <th className="px-4 py-3">Tanggal</th>
-                  <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3">Sumber</th>
-                  <th className="px-4 py-3 text-right">Aksi</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((app) => (
-                  <Row key={app.id} app={app} deleting={deleting} onDelete={handleDelete} onStatusChange={handleStatusChange} onEdit={(a) => { setEditItem(a); setFormOpen(true); }} />
-                ))}
-              </tbody>
-            </table>
+          {/* Desktop View: Table Layout */}
+          <div className="hidden md:block rounded-xl border bg-card shadow-sm overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead className="border-b bg-muted/40 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  <tr>
+                    <th className="px-4 py-3">Perusahaan</th>
+                    <th className="px-4 py-3">Posisi</th>
+                    <th className="px-4 py-3">Lokasi</th>
+                    <th className="px-4 py-3">Tanggal Melamar</th>
+                    <th className="px-4 py-3">Status</th>
+                    <th className="px-4 py-3">Sumber</th>
+                    <th className="px-4 py-3 text-right">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y">
+                  {filtered.map((app) => (
+                    <Row
+                      key={app.id}
+                      app={app}
+                      deleting={deleting}
+                      onDelete={handleDelete}
+                      onStatusChange={handleStatusChange}
+                      onEdit={(a) => {
+                        setEditItem(a);
+                        setFormOpen(true);
+                      }}
+                    />
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </>
       )}
 
-      <div className="text-xs text-muted-foreground text-right">
-        Menampilkan {filtered.length} dari {data.length} lamaran
-      </div>
-
-      <LamaranForm open={formOpen} onOpenChange={setFormOpen} initialData={editItem} />
+      <LamaranForm
+        open={formOpen}
+        onOpenChange={setFormOpen}
+        initialData={editItem}
+      />
     </div>
   );
 }
+
 
 function MobileCard({ app, deleting, onDelete, onStatusChange, onEdit }: {
   app: JobApplication;

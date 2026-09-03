@@ -7,9 +7,10 @@ import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { STATUS_OPTIONS, SOURCE_OPTIONS, type JobApplication } from "@/lib/types";
+import { STATUS_OPTIONS, SOURCE_OPTIONS, STATUS_COLORS, type JobApplication, type JobStatus } from "@/lib/types";
 import { INDONESIA_LOCATIONS } from "@/lib/locations";
 import { createApplication, updateApplication } from "@/lib/actions";
+import { cn } from "@/lib/utils";
 
 interface LamaranFormProps {
   open: boolean;
@@ -84,21 +85,26 @@ function LocationInput({ defaultValue }: { defaultValue?: string }) {
 export function LamaranForm({ open, onOpenChange, initialData }: LamaranFormProps) {
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  const [selectedStatus, setSelectedStatus] = React.useState<JobStatus>("applied");
   const formRef = React.useRef<HTMLFormElement>(null);
 
   React.useEffect(() => {
     if (open) {
       setError(null);
+      setSelectedStatus(initialData?.status ?? "applied");
       if (formRef.current) formRef.current.reset();
     }
-  }, [open]);
+  }, [open, initialData]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
     setError(null);
     try {
+
+
       const fd = new FormData(formRef.current!);
+      fd.set("status", selectedStatus);
       const res = initialData
         ? await updateApplication(initialData.id, fd)
         : await createApplication(fd);
@@ -140,23 +146,41 @@ export function LamaranForm({ open, onOpenChange, initialData }: LamaranFormProp
           </div>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <LocationInput defaultValue={initialData?.location ?? ""} />
-          <div className="space-y-1.5">
-            <Label htmlFor="status">Status</Label>
-            <Select id="status" name="status" defaultValue={initialData?.status ?? "applied"}>
-              {STATUS_OPTIONS.map((s) => (
-                <option key={s.value} value={s.value}>{s.label}</option>
-              ))}
-            </Select>
+        <div className="space-y-2">
+          <Label>Status Lamaran</Label>
+          <div className="flex flex-wrap gap-2 pt-0.5">
+            {STATUS_OPTIONS.map((s) => {
+              const isSelected = selectedStatus === s.value;
+              const colorClass = STATUS_COLORS[s.value];
+              return (
+                <button
+                  key={s.value}
+                  type="button"
+                  onClick={() => setSelectedStatus(s.value)}
+                  className={cn(
+                    "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all cursor-pointer",
+                    isSelected
+                      ? cn(colorClass, "ring-2 ring-primary/40 scale-[1.02] shadow-xs font-bold")
+                      : "bg-muted/40 text-muted-foreground border-transparent hover:bg-muted"
+                  )}
+                >
+                  <span className={cn("h-2 w-2 rounded-full", isSelected ? "bg-current" : "bg-muted-foreground/40")} />
+                  {s.label}
+                </button>
+              );
+            })}
           </div>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
+          <LocationInput defaultValue={initialData?.location ?? ""} />
           <div className="space-y-1.5">
             <Label htmlFor="applied_date">Tanggal Melamar *</Label>
             <Input id="applied_date" name="applied_date" type="date" required defaultValue={initialData?.applied_date ?? today()} />
           </div>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
             <Label htmlFor="source">Sumber Lamaran</Label>
             <Select id="source" name="source" defaultValue={initialData?.source ?? ""}>
@@ -166,11 +190,10 @@ export function LamaranForm({ open, onOpenChange, initialData }: LamaranFormProp
               ))}
             </Select>
           </div>
-        </div>
-
-        <div className="space-y-1.5">
-          <Label htmlFor="job_url">URL Lowongan</Label>
-          <Input id="job_url" name="job_url" type="text" placeholder="https://..." defaultValue={initialData?.job_url ?? ""} />
+          <div className="space-y-1.5">
+            <Label htmlFor="job_url">URL Lowongan</Label>
+            <Input id="job_url" name="job_url" type="text" placeholder="https://..." defaultValue={initialData?.job_url ?? ""} />
+          </div>
         </div>
 
         <div className="space-y-1.5">
