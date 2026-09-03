@@ -6,11 +6,12 @@ export function StatusBadge({ status }: { status: JobStatus }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center justify-center rounded-full px-3 py-1 text-xs font-semibold border shadow-2xs",
+        "inline-flex items-center justify-center rounded-full px-3.5 py-1 text-xs font-semibold border transition-colors",
         STATUS_COLORS[status]
       )}
     >
-      <span>{label}</span>
+      {label}
     </span>
   );
 }
+
