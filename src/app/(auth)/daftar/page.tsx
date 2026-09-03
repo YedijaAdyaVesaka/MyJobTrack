@@ -28,7 +28,7 @@ export default function DaftarPage() {
 
     setLoading(true);
     const supabase = createClient();
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -39,6 +39,12 @@ export default function DaftarPage() {
     if (error) {
       setError(error.message);
       setLoading(false);
+      return;
+    }
+
+    // Jika Confirm Email di-nonaktifkan di Supabase, user langsung login
+    if (data.session) {
+      window.location.href = "/dasbor";
       return;
     }
 
