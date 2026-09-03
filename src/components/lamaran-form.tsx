@@ -98,8 +98,7 @@ export function LamaranForm({ open, onOpenChange, initialData }: LamaranFormProp
     setLoading(true);
     setError(null);
     try {
-      const form = e.currentTarget;
-      const fd = new FormData(form);
+      const fd = new FormData(formRef.current!);
       const res = initialData
         ? await updateApplication(initialData.id, fd)
         : await createApplication(fd);

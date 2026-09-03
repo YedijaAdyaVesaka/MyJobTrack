@@ -54,7 +54,6 @@ export async function createApplication(formData: FormData): Promise<{ success: 
     const status = (formData.get("status") as JobStatus) || "applied";
     const source = (formData.get("source") as string || "").trim() || null;
     let job_url = (formData.get("job_url") as string || "").trim() || null;
-    const salary_range = (formData.get("salary_range") as string || "").trim() || null;
     const notes = (formData.get("notes") as string || "").trim() || null;
 
     if (!company_name || !position || !applied_date) {
@@ -74,11 +73,13 @@ export async function createApplication(formData: FormData): Promise<{ success: 
       status,
       source,
       job_url,
-      salary_range,
       notes,
     });
 
-    if (error) return { success: false, error: error.message };
+    if (error) {
+      console.error("Supabase insert error:", error);
+      return { success: false, error: error.message };
+    }
 
     revalidatePath("/lamaran");
     revalidatePath("/dasbor");
@@ -101,7 +102,6 @@ export async function updateApplication(id: string, formData: FormData): Promise
     const status = formData.get("status") as JobStatus;
     const source = (formData.get("source") as string || "").trim() || null;
     let job_url = (formData.get("job_url") as string || "").trim() || null;
-    const salary_range = (formData.get("salary_range") as string || "").trim() || null;
     const notes = (formData.get("notes") as string || "").trim() || null;
 
     if (!company_name || !position || !applied_date) {
@@ -122,12 +122,14 @@ export async function updateApplication(id: string, formData: FormData): Promise
         status,
         source,
         job_url,
-        salary_range,
         notes,
       })
       .eq("id", id);
 
-    if (error) return { success: false, error: error.message };
+    if (error) {
+      console.error("Supabase update error:", error);
+      return { success: false, error: error.message };
+    }
 
     revalidatePath("/lamaran");
     revalidatePath("/dasbor");
