@@ -2,83 +2,18 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Pencil, Trash2, ExternalLink, ChevronDown, Check } from "lucide-react";
+import { Plus, Pencil, Trash2, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { LamaranForm } from "@/components/lamaran-form";
-import { deleteApplication, updateApplicationStatus } from "@/lib/actions";
+import { deleteApplication } from "@/lib/actions";
 import type { JobApplication, JobStatus } from "@/lib/types";
 import { STATUS_OPTIONS, STATUS_COLORS } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { StatusBadge } from "@/components/ui/status-badge";
 
 interface LamaranTableProps {
   data: JobApplication[];
-}
-
-function StatusDropdown({ status, onChange }: { status: JobStatus; onChange: (s: JobStatus) => void }) {
-  const [open, setOpen] = React.useState(false);
-  const ref = React.useRef<HTMLDivElement>(null);
-
-  const currentOption = STATUS_OPTIONS.find((s) => s.value === status) || STATUS_OPTIONS[0];
-  const colorClass = STATUS_COLORS[status] || "bg-secondary text-secondary-foreground border-border";
-
-  React.useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  return (
-    <div ref={ref} className="relative inline-block text-left">
-      <button
-        type="button"
-        onClick={() => setOpen(!open)}
-        className={cn(
-          "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border shadow-xs transition-all hover:brightness-95 active:scale-[0.98]",
-          colorClass
-        )}
-      >
-        <span className="h-1.5 w-1.5 rounded-full bg-current shrink-0" />
-        <span className="font-bold tracking-tight">{currentOption.label}</span>
-        <ChevronDown className={cn("h-3.5 w-3.5 opacity-70 transition-transform duration-200 shrink-0", open && "rotate-180")} />
-      </button>
-
-      {open && (
-        <div className="absolute right-0 sm:left-0 z-50 mt-1.5 w-44 rounded-xl border bg-popover text-popover-foreground shadow-xl ring-1 ring-border p-1 animate-in fade-in-0 zoom-in-95 dark:bg-zinc-900 dark:border-zinc-800">
-          {STATUS_OPTIONS.map((opt) => {
-            const isSelected = opt.value === status;
-            const badgeColor = STATUS_COLORS[opt.value];
-            return (
-              <button
-                key={opt.value}
-                type="button"
-                onClick={() => {
-                  onChange(opt.value);
-                  setOpen(false);
-                }}
-                className={cn(
-                  "flex w-full items-center justify-between px-2.5 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer",
-                  isSelected
-                    ? "bg-accent text-accent-foreground font-bold"
-                    : "hover:bg-muted text-foreground dark:hover:bg-zinc-800"
-                )}
-              >
-                <div className="flex items-center gap-2">
-                  <span className={cn("h-2 w-2 rounded-full", badgeColor.split(" ")[0])} />
-                  <span>{opt.label}</span>
-                </div>
-                {isSelected && <Check className="h-3.5 w-3.5 text-primary shrink-0" />}
-              </button>
-            );
-          })}
-        </div>
-      )}
-    </div>
-  );
 }
 
 export function LamaranTable({ data }: LamaranTableProps) {
@@ -112,15 +47,6 @@ export function LamaranTable({ data }: LamaranTableProps) {
     }
   }
 
-  async function handleStatusChange(id: string, status: JobStatus) {
-    const res = await updateApplicationStatus(id, status);
-    if (!res.success) {
-      alert(res.error || "Gagal mengubah status");
-      return;
-    }
-    router.refresh();
-  }
-
   return (
     <div className="space-y-4">
       {/* Filter and Search Bar */}
@@ -137,7 +63,7 @@ export function LamaranTable({ data }: LamaranTableProps) {
           </Button>
         </div>
 
-        {/* Filter Pills (no dropdown) */}
+        {/* Filter Pills */}
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1.5 no-scrollbar -mx-1 px-1">
           <button
             type="button"
@@ -195,7 +121,6 @@ export function LamaranTable({ data }: LamaranTableProps) {
                 app={app}
                 deleting={deleting}
                 onDelete={handleDelete}
-                onStatusChange={handleStatusChange}
                 onEdit={(a) => {
                   setEditItem(a);
                   setFormOpen(true);
@@ -226,7 +151,6 @@ export function LamaranTable({ data }: LamaranTableProps) {
                       app={app}
                       deleting={deleting}
                       onDelete={handleDelete}
-                      onStatusChange={handleStatusChange}
                       onEdit={(a) => {
                         setEditItem(a);
                         setFormOpen(true);
@@ -248,13 +172,13 @@ export function LamaranTable({ data }: LamaranTableProps) {
     </div>
   );
 }
+  
 
 
-function MobileCard({ app, deleting, onDelete, onStatusChange, onEdit }: {
+function MobileCard({ app, deleting, onDelete, onEdit }: {
   app: JobApplication;
   deleting: string | null;
   onDelete: (id: string) => void;
-  onStatusChange: (id: string, status: JobStatus) => void;
   onEdit: (app: JobApplication) => void;
 }) {
   return (
@@ -296,17 +220,16 @@ function MobileCard({ app, deleting, onDelete, onStatusChange, onEdit }: {
 
       <div className="flex items-center justify-between pt-1">
         <span className="text-xs text-muted-foreground font-medium">Status:</span>
-        <StatusDropdown status={app.status} onChange={(status) => onStatusChange(app.id, status)} />
+        <StatusBadge status={app.status} />
       </div>
     </div>
   );
 }
 
-function Row({ app, deleting, onDelete, onStatusChange, onEdit }: {
+function Row({ app, deleting, onDelete, onEdit }: {
   app: JobApplication;
   deleting: string | null;
   onDelete: (id: string) => void;
-  onStatusChange: (id: string, status: JobStatus) => void;
   onEdit: (app: JobApplication) => void;
 }) {
   return (
@@ -327,7 +250,7 @@ function Row({ app, deleting, onDelete, onStatusChange, onEdit }: {
         {new Date(app.applied_date).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })}
       </td>
       <td className="px-4 py-3">
-        <StatusDropdown status={app.status} onChange={(status) => onStatusChange(app.id, status)} />
+        <StatusBadge status={app.status} />
       </td>
       <td className="px-4 py-3 text-muted-foreground">{app.source ?? "—"}</td>
       <td className="px-4 py-3 text-right">
