@@ -15,6 +15,7 @@ create table if not exists public.job_applications (
     'applied', 'screening', 'interview', 'offer', 'accepted', 'rejected'
   )),
   source text, -- LinkedIn, JobStreet, Referral, dll
+  location text, -- Kota Malang, Kabupaten Malang, Remote, dll
   job_url text,
   salary_range text,
   recruiter_name text,

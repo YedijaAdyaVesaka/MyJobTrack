@@ -1,4 +1,11 @@
-export default function LamaranPage() {
+import { getApplications } from "@/lib/actions";
+import { LamaranTable } from "@/components/lamaran-table";
+
+export const dynamic = "force-dynamic";
+
+export default async function LamaranPage() {
+  const data = await getApplications();
+
   return (
     <div className="space-y-6">
       <div>
@@ -7,9 +14,8 @@ export default function LamaranPage() {
           Kelola semua lamaran kerja kamu di sini.
         </p>
       </div>
-      <div className="rounded-xl border bg-card p-12 shadow-sm flex items-center justify-center text-muted-foreground text-sm">
-        Belum ada lamaran. Fitur ini akan tersedia di Phase 2.
-      </div>
+      <LamaranTable data={data} />
     </div>
   );
 }
+
