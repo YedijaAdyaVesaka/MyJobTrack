@@ -153,7 +153,7 @@ export function LamaranForm({ open, onOpenChange, initialData }: LamaranFormProp
           </div>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
             <Label htmlFor="applied_date">Tanggal Melamar *</Label>
             <Input id="applied_date" name="applied_date" type="date" required defaultValue={initialData?.applied_date ?? today()} />
@@ -166,10 +166,6 @@ export function LamaranForm({ open, onOpenChange, initialData }: LamaranFormProp
                 <option key={s} value={s}>{s}</option>
               ))}
             </Select>
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="salary_range">Range Gaji</Label>
-            <Input id="salary_range" name="salary_range" placeholder="Contoh: 8-12 juta" defaultValue={initialData?.salary_range ?? ""} />
           </div>
         </div>
 
