@@ -54,14 +54,14 @@ export function DasborGreeting() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold tracking-tight">
+      <h1 className="text-2xl font-bold tracking-tight">
         {greeting}
         {name ? `, ${name}` : ""} 👋
       </h1>
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-1">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-1.5">
         <p className="text-sm text-muted-foreground">{dateStr}</p>
         {clock && (
-          <span className="text-sm font-medium tabular-nums text-primary">
+          <span className="inline-flex items-center gap-1.5 text-sm font-medium tabular-nums text-primary bg-primary/10 rounded-full px-2.5 py-0.5">
             🕐 {clock}
           </span>
         )}

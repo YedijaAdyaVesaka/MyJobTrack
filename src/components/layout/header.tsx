@@ -58,7 +58,7 @@ export function Header({ title }: { title?: string }) {
   };
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-background/80 backdrop-blur-sm px-4 md:px-6">
+    <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border/60 bg-background/70 backdrop-blur-xl px-4 md:px-6">
       <div className="flex items-center gap-3">
         <MobileNav />
         {title && <h1 className="text-lg font-semibold">{title}</h1>}
@@ -110,7 +110,7 @@ export function Header({ title }: { title?: string }) {
           </button>
 
           {showNotifMenu && (
-            <div className="absolute right-0 mt-2 w-72 rounded-xl border border-border bg-popover p-3 text-popover-foreground shadow-lg z-50 animate-in fade-in-50 zoom-in-95">
+            <div className="absolute right-0 mt-2 w-72 rounded-2xl border border-border/60 bg-popover p-3 text-popover-foreground shadow-xl z-50 animate-slide-up">
               <div className="flex items-center justify-between border-b border-border pb-2 mb-2">
                 <span className="text-xs font-semibold">Notifikasi & Agenda</span>
                 <span className="text-[10px] text-muted-foreground bg-muted px-2 py-0.5 rounded-full">Terbaru</span>
@@ -135,13 +135,13 @@ export function Header({ title }: { title?: string }) {
               setShowUserMenu(!showUserMenu);
               setShowNotifMenu(false);
             }}
-            className="ml-1 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+            className="ml-1 flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary/70 text-xs font-semibold text-primary-foreground shadow-sm transition-all duration-200 hover:scale-105 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
           >
             {initial}
           </button>
 
           {showUserMenu && (
-            <div className="absolute right-0 mt-2 w-56 rounded-xl border border-border bg-popover p-1.5 text-popover-foreground shadow-lg z-50 animate-in fade-in-50 zoom-in-95">
+            <div className="absolute right-0 mt-2 w-56 rounded-2xl border border-border/60 bg-popover p-1.5 text-popover-foreground shadow-xl z-50 animate-slide-up">
               <div className="px-3 py-2 border-b border-border mb-1">
                 <p className="text-xs font-medium text-foreground truncate">{email || "Pengguna MyJobTrack"}</p>
                 <p className="text-[11px] text-muted-foreground">Akun Terverifikasi</p>

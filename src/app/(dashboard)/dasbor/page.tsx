@@ -5,7 +5,7 @@ import {
   MessageSquare,
   CheckCircle2,
   Calendar,
-  Building2,
+  ArrowUpRight,
 } from "lucide-react";
 import Link from "next/link";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -29,10 +29,10 @@ export default async function DasborPage() {
   const responseRate = total > 0 ? Math.round((respondedCount / total) * 100) : 0;
 
   const stats = [
-    { label: "Total Lamaran", value: total.toString(), icon: Briefcase, color: "text-primary" },
-    { label: "Wawancara", value: interviewCount.toString(), icon: MessageSquare, color: "text-warning" },
-    { label: "Penawaran", value: offerCount.toString(), icon: CheckCircle2, color: "text-success" },
-    { label: "Tingkat Respons", value: `${responseRate}%`, icon: TrendingUp, color: "text-primary" },
+    { label: "Total Lamaran", value: total.toString(), icon: Briefcase, gradient: "from-blue-500/10 to-blue-600/5", iconColor: "text-blue-500" },
+    { label: "Wawancara", value: interviewCount.toString(), icon: MessageSquare, gradient: "from-amber-500/10 to-amber-600/5", iconColor: "text-amber-500" },
+    { label: "Penawaran", value: offerCount.toString(), icon: CheckCircle2, gradient: "from-emerald-500/10 to-emerald-600/5", iconColor: "text-emerald-500" },
+    { label: "Tingkat Respons", value: `${responseRate}%`, icon: TrendingUp, gradient: "from-violet-500/10 to-violet-600/5", iconColor: "text-violet-500" },
   ];
 
   const recent = applications.slice(0, 5);
@@ -48,40 +48,42 @@ export default async function DasborPage() {
       {/* Stat Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((s) => (
-          <div key={s.label} className="rounded-xl border bg-card p-5 shadow-sm">
+          <div key={s.label} className={`rounded-2xl border bg-gradient-to-br ${s.gradient} p-5 shadow-sm transition-shadow hover:shadow-md`}>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">{s.label}</span>
-              <s.icon className={`h-4 w-4 ${s.color}`} />
+              <span className="text-sm font-medium text-muted-foreground">{s.label}</span>
+              <div className={`rounded-xl p-2 bg-background/60 ${s.iconColor}`}>
+                <s.icon className="h-4 w-4" />
+              </div>
             </div>
-            <p className="mt-2 text-2xl font-semibold tabular-nums">{s.value}</p>
+            <p className="mt-3 text-3xl font-bold tabular-nums tracking-tight">{s.value}</p>
           </div>
         ))}
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">
         {/* Recent Applications */}
-        <div className="lg:col-span-2 rounded-xl border bg-card p-6 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
+        <div className="lg:col-span-2 rounded-2xl border bg-card p-6 shadow-sm">
+          <div className="flex items-center justify-between mb-5">
             <h2 className="text-lg font-semibold">Lamaran Terbaru</h2>
-            <Link href="/lamaran" className="text-xs text-primary hover:underline">
-              Lihat semua →
+            <Link href="/lamaran" className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline">
+              Lihat semua <ArrowUpRight className="h-3 w-3" />
             </Link>
           </div>
           {recent.length === 0 ? (
-            <div className="flex h-36 items-center justify-center text-muted-foreground text-sm">
+            <div className="flex h-40 items-center justify-center rounded-xl border border-dashed text-muted-foreground text-sm">
               Belum ada lamaran. Mulai tambahkan lamaran pertamamu!
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-1">
               {recent.map((app) => (
-                <div key={app.id} className="flex items-center justify-between border-b pb-3 last:border-b-0 last:pb-0">
+                <div key={app.id} className="flex items-center justify-between rounded-xl px-3 py-3 hover:bg-muted/50 transition-colors">
                   <div>
                     <p className="font-medium text-sm">{app.company_name}</p>
                     <p className="text-xs text-muted-foreground">{app.position}</p>
                   </div>
                   <div className="flex items-center gap-3">
                     <StatusBadge status={app.status} />
-                    <span className="text-xs text-muted-foreground whitespace-nowrap">
+                    <span className="text-xs text-muted-foreground whitespace-nowrap tabular-nums">
                       {new Date(app.applied_date).toLocaleDateString("id-ID", { day: "numeric", month: "short" })}
                     </span>
                   </div>
@@ -92,22 +94,24 @@ export default async function DasborPage() {
         </div>
 
         {/* Agenda / Follow ups */}
-        <div className="rounded-xl border bg-card p-6 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
+        <div className="rounded-2xl border bg-card p-6 shadow-sm">
+          <div className="flex items-center justify-between mb-5">
             <h2 className="text-lg font-semibold">Agenda Mendatang</h2>
           </div>
           {upcomingFollowUps.length === 0 ? (
-            <div className="flex h-36 items-center justify-center text-muted-foreground text-sm text-center">
+            <div className="flex h-40 items-center justify-center rounded-xl border border-dashed text-muted-foreground text-sm text-center px-4">
               Belum ada agenda follow-up mendatang.
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-1">
               {upcomingFollowUps.map((app) => (
-                <div key={app.id} className="flex items-start gap-2.5 text-sm border-b pb-2.5 last:border-b-0">
-                  <Calendar className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                <div key={app.id} className="flex items-start gap-3 rounded-xl px-3 py-3 hover:bg-muted/50 transition-colors">
+                  <div className="rounded-lg bg-primary/10 p-2 mt-0.5">
+                    <Calendar className="h-3.5 w-3.5 text-primary" />
+                  </div>
                   <div>
                     <p className="font-medium text-xs">{app.company_name} — {app.position}</p>
-                    <p className="text-[11px] text-muted-foreground">
+                    <p className="text-[11px] text-muted-foreground mt-0.5">
                       Follow-up: {new Date(app.follow_up_date!).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })}
                     </p>
                   </div>

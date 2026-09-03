@@ -2,17 +2,82 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Pencil, Trash2, ExternalLink } from "lucide-react";
+import { Plus, Pencil, Trash2, ExternalLink, ChevronDown, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { LamaranForm } from "@/components/lamaran-form";
 import { deleteApplication, updateApplicationStatus } from "@/lib/actions";
 import type { JobApplication, JobStatus } from "@/lib/types";
-import { STATUS_OPTIONS } from "@/lib/types";
+import { STATUS_OPTIONS, STATUS_COLORS } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 interface LamaranTableProps {
   data: JobApplication[];
+}
+
+function StatusDropdown({ status, onChange }: { status: JobStatus; onChange: (s: JobStatus) => void }) {
+  const [open, setOpen] = React.useState(false);
+  const ref = React.useRef<HTMLDivElement>(null);
+
+  const currentOption = STATUS_OPTIONS.find((s) => s.value === status) || STATUS_OPTIONS[0];
+  const colorClass = STATUS_COLORS[status] || "bg-secondary text-secondary-foreground border-border";
+
+  React.useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <div ref={ref} className="relative inline-block text-left">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className={cn(
+          "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border transition-all hover:scale-[1.02] active:scale-[0.98]",
+          colorClass
+        )}
+      >
+        <span className="h-1.5 w-1.5 rounded-full bg-current" />
+        <span>{currentOption.label}</span>
+        <ChevronDown className={cn("h-3 w-3 opacity-60 transition-transform duration-200", open && "rotate-180")} />
+      </button>
+
+      {open && (
+        <div className="absolute right-0 sm:left-0 z-50 mt-1.5 w-40 rounded-xl border bg-popover/95 backdrop-blur-md p-1 shadow-lg ring-1 ring-black/5 animate-in fade-in-0 zoom-in-95">
+          {STATUS_OPTIONS.map((opt) => {
+            const isSelected = opt.value === status;
+            const badgeColor = STATUS_COLORS[opt.value];
+            return (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => {
+                  onChange(opt.value);
+                  setOpen(false);
+                }}
+                className={cn(
+                  "flex w-full items-center justify-between px-2.5 py-1.5 text-xs font-medium rounded-lg transition-colors",
+                  isSelected ? "bg-accent text-accent-foreground font-semibold" : "hover:bg-muted text-popover-foreground"
+                )}
+              >
+                <div className="flex items-center gap-2">
+                  <span className={cn("h-2 w-2 rounded-full", badgeColor.split(" ")[0])} />
+                  <span>{opt.label}</span>
+                </div>
+                {isSelected && <Check className="h-3.5 w-3.5 text-primary shrink-0" />}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export function LamaranTable({ data }: LamaranTableProps) {
@@ -172,16 +237,8 @@ function MobileCard({ app, deleting, onDelete, onStatusChange, onEdit }: {
       </div>
 
       <div className="flex items-center justify-between pt-1">
-        <span className="text-xs text-muted-foreground">Status:</span>
-        <select
-          value={app.status}
-          onChange={(e) => onStatusChange(app.id, e.target.value as JobStatus)}
-          className="text-xs font-medium bg-secondary text-primary rounded-lg px-2.5 py-1 border-0 cursor-pointer focus:ring-1 focus:ring-primary"
-        >
-          {STATUS_OPTIONS.map((s) => (
-            <option key={s.value} value={s.value}>{s.label}</option>
-          ))}
-        </select>
+        <span className="text-xs text-muted-foreground font-medium">Status:</span>
+        <StatusDropdown status={app.status} onChange={(status) => onStatusChange(app.id, status)} />
       </div>
     </div>
   );
@@ -212,11 +269,7 @@ function Row({ app, deleting, onDelete, onStatusChange, onEdit }: {
         {new Date(app.applied_date).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })}
       </td>
       <td className="px-4 py-3">
-        <select value={app.status} onChange={(e) => onStatusChange(app.id, e.target.value as JobStatus)} className="text-xs bg-transparent border-0 p-0 cursor-pointer focus:ring-0">
-          {STATUS_OPTIONS.map((s) => (
-            <option key={s.value} value={s.value}>{s.label}</option>
-          ))}
-        </select>
+        <StatusDropdown status={app.status} onChange={(status) => onStatusChange(app.id, status)} />
       </td>
       <td className="px-4 py-3 text-muted-foreground">{app.source ?? "—"}</td>
       <td className="px-4 py-3 text-right">

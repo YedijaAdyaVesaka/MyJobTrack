@@ -46,42 +46,44 @@ export function PengaturanView({
   return (
     <div className="space-y-6 max-w-4xl">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Pengaturan Akun</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Pengaturan Akun</h1>
         <p className="text-sm text-muted-foreground mt-1">Kelola akun dan ekspor data aplikasi kamu.</p>
       </div>
 
-      <div className="rounded-xl border bg-card p-6 shadow-sm space-y-4">
-        <div className="flex items-center gap-3 pb-4 border-b">
-          <div className="rounded-full bg-primary/10 p-3 text-primary">
+      <div className="rounded-2xl border bg-card/80 backdrop-blur-sm p-6 shadow-sm space-y-4">
+        <div className="flex items-center gap-3.5 pb-4 border-b">
+          <div className="rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 p-3 text-primary ring-1 ring-primary/20 shadow-sm">
             <User className="h-6 w-6" />
           </div>
           <div>
-            <div className="text-base font-semibold">{userEmail}</div>
-            <div className="text-xs text-muted-foreground">Akun Terverifikasi</div>
+            <div className="text-base font-bold tracking-tight">{userEmail}</div>
+            <div className="text-xs text-muted-foreground font-medium">Akun Terverifikasi</div>
           </div>
         </div>
 
-        <div className="space-y-3 pt-2">
+        <div className="space-y-3 pt-1">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">Keamanan Akun</span>
-            <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-600 dark:text-emerald-400">
-              <ShieldCheck className="h-4 w-4" /> Dilindungi Supabase Auth
+            <span className="text-muted-foreground font-medium">Keamanan Akun</span>
+            <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+              <ShieldCheck className="h-3.5 w-3.5" /> Dilindungi Supabase Auth
             </span>
           </div>
         </div>
       </div>
 
-      <div className="rounded-xl border bg-card p-6 shadow-sm space-y-4">
-        <div className="flex items-center gap-2">
-          <Database className="h-5 w-5 text-primary" />
+      <div className="rounded-2xl border bg-card/80 backdrop-blur-sm p-6 shadow-sm space-y-4">
+        <div className="flex items-center gap-2.5">
+          <div className="rounded-xl p-2 bg-primary/10 text-primary">
+            <Database className="h-5 w-5" />
+          </div>
           <h2 className="text-base font-semibold">Manajemen Data</h2>
         </div>
-        <p className="text-sm text-muted-foreground">
-          Kamu memiliki <strong>{applications.length}</strong> lamaran tersimpan. Unduh file CSV cadangan data lamaran kamu kapan saja.
+        <p className="text-sm text-muted-foreground leading-relaxed">
+          Kamu memiliki <strong className="text-foreground font-semibold">{applications.length}</strong> lamaran tersimpan. Unduh file CSV cadangan data lamaran kamu kapan saja.
         </p>
 
         <div className="pt-2">
-          <Button onClick={exportCSV} variant="outline" className="gap-2">
+          <Button onClick={exportCSV} variant="outline" className="gap-2 rounded-xl">
             <Download className="h-4 w-4" /> Ekspor Data (CSV)
           </Button>
         </div>
