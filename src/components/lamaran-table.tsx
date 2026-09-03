@@ -39,17 +39,17 @@ function StatusDropdown({ status, onChange }: { status: JobStatus; onChange: (s:
         type="button"
         onClick={() => setOpen(!open)}
         className={cn(
-          "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border transition-all hover:scale-[1.02] active:scale-[0.98]",
+          "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border shadow-xs transition-all hover:brightness-95 active:scale-[0.98]",
           colorClass
         )}
       >
-        <span className="h-1.5 w-1.5 rounded-full bg-current" />
-        <span>{currentOption.label}</span>
-        <ChevronDown className={cn("h-3 w-3 opacity-60 transition-transform duration-200", open && "rotate-180")} />
+        <span className="h-1.5 w-1.5 rounded-full bg-current shrink-0" />
+        <span className="font-bold tracking-tight">{currentOption.label}</span>
+        <ChevronDown className={cn("h-3.5 w-3.5 opacity-70 transition-transform duration-200 shrink-0", open && "rotate-180")} />
       </button>
 
       {open && (
-        <div className="absolute right-0 sm:left-0 z-50 mt-1.5 w-40 rounded-xl border bg-popover/95 backdrop-blur-md p-1 shadow-lg ring-1 ring-black/5 animate-in fade-in-0 zoom-in-95">
+        <div className="absolute right-0 sm:left-0 z-50 mt-1.5 w-44 rounded-xl border bg-popover/95 backdrop-blur-md p-1 shadow-xl ring-1 ring-black/5 animate-in fade-in-0 zoom-in-95">
           {STATUS_OPTIONS.map((opt) => {
             const isSelected = opt.value === status;
             const badgeColor = STATUS_COLORS[opt.value];
@@ -62,8 +62,8 @@ function StatusDropdown({ status, onChange }: { status: JobStatus; onChange: (s:
                   setOpen(false);
                 }}
                 className={cn(
-                  "flex w-full items-center justify-between px-2.5 py-1.5 text-xs font-medium rounded-lg transition-colors",
-                  isSelected ? "bg-accent text-accent-foreground font-semibold" : "hover:bg-muted text-popover-foreground"
+                  "flex w-full items-center justify-between px-2.5 py-1.5 text-xs font-semibold rounded-lg transition-colors",
+                  isSelected ? "bg-accent text-accent-foreground font-bold" : "hover:bg-muted text-popover-foreground"
                 )}
               >
                 <div className="flex items-center gap-2">

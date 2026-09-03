@@ -7,12 +7,12 @@ export function StatusBadge({ status }: { status: JobStatus }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium",
+        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold border shadow-2xs",
         STATUS_COLORS[status]
       )}
     >
-      <span className={cn("h-1.5 w-1.5 rounded-full bg-current", isActive && "animate-dot-pulse")} />
-      {label}
+      <span className={cn("h-1.5 w-1.5 rounded-full bg-current shrink-0", isActive && "animate-dot-pulse")} />
+      <span>{label}</span>
     </span>
   );
 }
