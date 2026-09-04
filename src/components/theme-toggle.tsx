@@ -12,15 +12,15 @@ const getServerSnapshot = () => false;
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
   const mounted = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-  if (!mounted) return <div className="flex gap-0.5 rounded-lg bg-muted p-0.5 h-8 w-[68px]" />;
+  if (!mounted) return <div className="flex gap-0.5 rounded-full bg-muted/80 p-1 h-8 w-[68px]" />;
 
   return (
-    <div className="flex gap-0.5 rounded-lg bg-muted p-0.5">
+    <div className="flex items-center gap-0.5 rounded-full bg-muted/80 p-0.5 border border-border/40">
       <button
         onClick={() => setTheme("light")}
-        className={`rounded-md p-1.5 transition-colors ${
+        className={`rounded-full p-1.5 transition-all ${
           theme === "light"
-            ? "bg-background text-foreground shadow-sm"
+            ? "bg-background text-foreground shadow-xs"
             : "text-muted-foreground hover:text-foreground"
         }`}
         aria-label="Mode terang"
@@ -29,9 +29,9 @@ export function ThemeToggle() {
       </button>
       <button
         onClick={() => setTheme("dark")}
-        className={`rounded-md p-1.5 transition-colors ${
+        className={`rounded-full p-1.5 transition-all ${
           theme === "dark"
-            ? "bg-background text-foreground shadow-sm"
+            ? "bg-background text-foreground shadow-xs"
             : "text-muted-foreground hover:text-foreground"
         }`}
         aria-label="Mode gelap"
@@ -41,3 +41,4 @@ export function ThemeToggle() {
     </div>
   );
 }
+
