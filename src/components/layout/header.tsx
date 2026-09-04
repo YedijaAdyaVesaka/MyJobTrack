@@ -138,9 +138,6 @@ export function Header({ title }: { title?: string }) {
           )}
         </div>
 
-        {/* Theme Toggle */}
-        <ThemeToggle />
-
         {/* User Profile Avatar & Dropdown */}
         <div className="relative" ref={userMenuRef}>
           <button
@@ -159,6 +156,11 @@ export function Header({ title }: { title?: string }) {
                 <p className="text-xs font-medium text-foreground truncate">{email || "Pengguna MyJobTrack"}</p>
                 <p className="text-[11px] text-muted-foreground">Akun Terverifikasi</p>
               </div>
+              <div className="flex items-center justify-between px-3 py-1.5 text-xs text-muted-foreground">
+                <span>Tema Tampilan</span>
+                <ThemeToggle />
+              </div>
+              <div className="h-px bg-border/60 my-1" />
               <Link
                 href="/pengaturan"
                 onClick={() => setShowUserMenu(false)}
@@ -169,7 +171,7 @@ export function Header({ title }: { title?: string }) {
               </Link>
               <button
                 onClick={handleLogout}
-                className="w-full flex items-center gap-2 rounded-md px-3 py-2 text-xs font-medium text-destructive hover:bg-destructive/10 transition-colors text-left"
+                className="w-full flex items-center gap-2 rounded-md px-3 py-2 text-xs font-medium text-destructive hover:bg-destructive/10 transition-colors text-left cursor-pointer"
               >
                 <LogOut className="h-4 w-4" />
                 Keluar
