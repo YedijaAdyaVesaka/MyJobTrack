@@ -3,9 +3,10 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Bell, Search, Settings, LogOut, CheckCircle2, X } from "lucide-react";
+import { Bell, Search, Settings, LogOut, CheckCircle2, X, PanelLeft } from "lucide-react";
 import { MobileNav } from "./mobile-nav";
 import { createClient } from "@/lib/supabase/client";
+import { useSidebar } from "@/components/layout/sidebar-context";
 
 export function Header({ title }: { title?: string }) {
   const [email, setEmail] = useState<string | null>(null);
@@ -15,6 +16,7 @@ export function Header({ title }: { title?: string }) {
   const [showSearchInput, setShowSearchInput] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
+  const { isCollapsed, toggleSidebar } = useSidebar();
 
   const userMenuRef = useRef<HTMLDivElement>(null);
   const notifMenuRef = useRef<HTMLDivElement>(null);
@@ -61,6 +63,13 @@ export function Header({ title }: { title?: string }) {
     <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border/60 bg-background/70 backdrop-blur-xl px-4 md:px-6">
       <div className="flex items-center gap-3">
         <MobileNav />
+        <button
+          onClick={toggleSidebar}
+          title={isCollapsed ? "Buka Sidebar" : "Tutup Sidebar"}
+          className="hidden md:flex items-center justify-center rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors cursor-pointer"
+        >
+          <PanelLeft className="h-4 w-4" />
+        </button>
         {title && <h1 className="text-lg font-semibold">{title}</h1>}
       </div>
       <div className="flex items-center gap-2">
