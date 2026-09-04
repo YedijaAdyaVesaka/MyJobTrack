@@ -66,7 +66,7 @@ export function Header({ title }: { title?: string }) {
         <button
           onClick={toggleSidebar}
           title={isCollapsed ? "Buka Sidebar" : "Tutup Sidebar"}
-          className="hidden md:flex items-center justify-center rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors cursor-pointer"
+          className="max-md:hidden md:flex items-center justify-center rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors cursor-pointer"
         >
           <PanelLeft className="h-4 w-4" />
         </button>
