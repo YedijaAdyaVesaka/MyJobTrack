@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Bell, Search, Settings, LogOut, CheckCircle2, X, PanelLeft } from "lucide-react";
 import { MobileNav } from "./mobile-nav";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { createClient } from "@/lib/supabase/client";
 import { useSidebar } from "@/components/layout/sidebar-context";
 
@@ -136,6 +137,9 @@ export function Header({ title }: { title?: string }) {
             </div>
           )}
         </div>
+
+        {/* Theme Toggle */}
+        <ThemeToggle />
 
         {/* User Profile Avatar & Dropdown */}
         <div className="relative" ref={userMenuRef}>

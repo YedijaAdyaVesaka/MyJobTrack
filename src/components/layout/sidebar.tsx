@@ -1,20 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   FileText,
   Columns3,
   BarChart3,
   Settings,
-  LogOut,
   Briefcase,
   ChevronLeft,
-  ChevronRight,
 } from "lucide-react";
-import { ThemeToggle } from "@/components/theme-toggle";
-import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 import { useSidebar } from "@/components/layout/sidebar-context";
 
@@ -31,14 +27,7 @@ const navBottom = [
 
 export function Sidebar() {
   const pathname = usePathname();
-  const router = useRouter();
   const { isCollapsed, toggleSidebar } = useSidebar();
-
-  const handleLogout = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    router.push("/masuk");
-  };
 
   return (
     <aside
@@ -141,32 +130,6 @@ export function Sidebar() {
           );
         })}
       </nav>
-
-      {/* Footer */}
-      <div className="flex flex-col gap-3 pt-3 border-t border-border/60">
-        {!isCollapsed ? (
-          <div className="flex items-center justify-between px-3">
-            <span className="text-sm font-medium text-muted-foreground">Tema</span>
-            <ThemeToggle />
-          </div>
-        ) : (
-          <div className="flex justify-center">
-            <ThemeToggle />
-          </div>
-        )}
-
-        <button
-          onClick={handleLogout}
-          title={isCollapsed ? "Keluar" : undefined}
-          className={cn(
-            "flex items-center gap-3 rounded-xl py-2.5 text-sm font-medium text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all duration-200 cursor-pointer group",
-            isCollapsed ? "px-0 justify-center" : "px-3.5"
-          )}
-        >
-          <LogOut className="h-4 w-4 shrink-0 transition-colors group-hover:text-destructive" />
-          {!isCollapsed && <span>Keluar</span>}
-        </button>
-      </div>
     </aside>
   );
 }
