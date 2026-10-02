@@ -108,25 +108,22 @@ export function HeaderSearch() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               autoFocus
-              className="h-8 w-44 sm:w-60 md:w-72 rounded-xl border border-primary/50 bg-background pl-8 pr-7 py-1 text-xs shadow-md focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary"
+              className="h-8 w-44 sm:w-60 md:w-72 rounded-xl border border-primary/50 bg-background pl-8 pr-8 py-1 text-xs shadow-md focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary"
             />
-            {query && (
-              <button
-                type="button"
-                onClick={() => setQuery("")}
-                className="absolute right-7 top-1/2 -translate-y-1/2 p-0.5 text-muted-foreground hover:text-foreground cursor-pointer"
-                title="Kosongkan"
-              >
-                <X className="h-3 w-3" />
-              </button>
-            )}
             <button
               type="button"
-              onClick={() => setIsOpen(false)}
-              className="ml-1 rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground cursor-pointer"
-              title="Tutup"
+              onClick={() => {
+                if (query) {
+                  setQuery("");
+                  inputRef.current?.focus();
+                } else {
+                  setIsOpen(false);
+                }
+              }}
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-foreground cursor-pointer"
+              title={query ? "Kosongkan" : "Tutup"}
             >
-              <X className="h-4 w-4" />
+              <X className="h-3.5 w-3.5" />
             </button>
           </form>
 
