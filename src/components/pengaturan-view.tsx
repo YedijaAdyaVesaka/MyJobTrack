@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { User, Download, ShieldCheck, Database, Check } from "lucide-react";
+import { User, Download, ShieldCheck, Database } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { JobApplication } from "@/lib/types";
 
@@ -12,15 +12,13 @@ export function PengaturanView({
   userEmail: string;
   applications: JobApplication[];
 }) {
-  const [copied, setCopied] = React.useState(false);
-
   function exportCSV() {
     if (applications.length === 0) {
       alert("Belum ada data lamaran untuk diexport.");
       return;
     }
 
-    const headers = ["Perusahaan", "Posisi", "Lokasi", "Tanggal Melamar", "Status", "Sumber", "Range Gaji", "URL Lowongan", "Catatan"];
+    const headers = ["Perusahaan", "Posisi", "Lokasi", "Tanggal Melamar", "Status", "Sumber", "Range Gaji", "Follow-up", "URL Lowongan", "Catatan"];
     const rows = applications.map((a) => [
       `"${a.company_name.replace(/"/g, '""')}"`,
       `"${a.position.replace(/"/g, '""')}"`,
@@ -29,6 +27,7 @@ export function PengaturanView({
       `"${a.status}"`,
       `"${(a.source || "").replace(/"/g, '""')}"`,
       `"${(a.salary_range || "").replace(/"/g, '""')}"`,
+      `"${(a.follow_up_date || "").replace(/"/g, '""')}"`,
       `"${(a.job_url || "").replace(/"/g, '""')}"`,
       `"${(a.notes || "").replace(/"/g, '""')}"`,
     ]);

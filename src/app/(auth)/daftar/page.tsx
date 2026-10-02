@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Briefcase, Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
@@ -10,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 export default function DaftarPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -44,7 +46,8 @@ export default function DaftarPage() {
 
     // Jika Confirm Email di-nonaktifkan di Supabase, user langsung login
     if (data.session) {
-      window.location.href = "/dasbor";
+      router.push("/dasbor");
+      router.refresh();
       return;
     }
 

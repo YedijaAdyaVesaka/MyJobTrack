@@ -1,21 +1,30 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Bell, Search, Settings, LogOut, CheckCircle2, X, PanelLeft } from "lucide-react";
+import {
+  Bell,
+  Settings,
+  LogOut,
+  CheckCircle2,
+  PanelLeft,
+  Calendar,
+  Briefcase,
+} from "lucide-react";
 import { MobileNav } from "./mobile-nav";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { HeaderSearch } from "./header-search";
 import { createClient } from "@/lib/supabase/client";
 import { useSidebar } from "@/components/layout/sidebar-context";
+import type { JobApplication } from "@/lib/types";
 
 export function Header({ title }: { title?: string }) {
   const [email, setEmail] = useState<string | null>(null);
   const [initial, setInitial] = useState<string>("U");
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showNotifMenu, setShowNotifMenu] = useState(false);
-  const [showSearchInput, setShowSearchInput] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [applications, setApplications] = useState<JobApplication[]>([]);
   const router = useRouter();
   const { isCollapsed, toggleSidebar } = useSidebar();
 
@@ -23,15 +32,32 @@ export function Header({ title }: { title?: string }) {
   const notifMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user?.email) {
-        setEmail(user.email);
-        setInitial(user.email.charAt(0).toUpperCase());
+    let ignore = false;
+    async function loadData() {
+      try {
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!ignore && user?.email) {
+          setEmail(user.email);
+          setInitial(user.email.charAt(0).toUpperCase());
+        }
+        const { data: apps } = await supabase
+          .from("job_applications")
+          .select("*")
+          .eq("is_deleted", false)
+          .order("applied_date", { ascending: false });
+
+        if (!ignore && apps) {
+          setApplications(apps);
+        }
+      } catch (err) {
+        console.error("Error loading header data:", err);
       }
+    }
+    loadData();
+    return () => {
+      ignore = true;
     };
-    fetchUser();
   }, []);
 
   useEffect(() => {
@@ -46,19 +72,28 @@ export function Header({ title }: { title?: string }) {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
   const handleLogout = async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
     router.push("/masuk");
   };
 
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      router.push(`/lamaran`);
-      setShowSearchInput(false);
-    }
-  };
+  const upcomingFollowUps = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return applications.filter((a) => {
+      if (!a.follow_up_date) return false;
+      const d = new Date(a.follow_up_date);
+      return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime() >= today.getTime();
+    }).slice(0, 4);
+  }, [applications]);
+
+  const interviewAlerts = useMemo(() => {
+    return applications.filter((a) => a.status === "interview").slice(0, 3);
+  }, [applications]);
+
+  const hasNotifications = upcomingFollowUps.length > 0 || interviewAlerts.length > 0;
 
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border/60 bg-background/70 backdrop-blur-xl px-4 md:px-6">
@@ -74,36 +109,8 @@ export function Header({ title }: { title?: string }) {
         {title && <h1 className="text-lg font-semibold">{title}</h1>}
       </div>
       <div className="flex items-center gap-2">
-        {/* Quick Search */}
-        <div className="relative">
-          {showSearchInput ? (
-            <form onSubmit={handleSearchSubmit} className="flex items-center gap-1">
-              <input
-                type="text"
-                placeholder="Cari..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                autoFocus
-                className="h-8 w-36 md:w-48 rounded-md border border-input bg-background px-2.5 py-1 text-xs shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-              />
-              <button
-                type="button"
-                onClick={() => setShowSearchInput(false)}
-                className="rounded-lg p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </form>
-          ) : (
-            <button
-              onClick={() => setShowSearchInput(true)}
-              title="Cari"
-              className="rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-            >
-              <Search className="h-[17px] w-[17px]" />
-            </button>
-          )}
-        </div>
+        {/* Real-time Search Engine */}
+        <HeaderSearch />
 
         {/* Notifications Dropdown */}
         <div className="relative" ref={notifMenuRef}>
@@ -112,27 +119,74 @@ export function Header({ title }: { title?: string }) {
               setShowNotifMenu(!showNotifMenu);
               setShowUserMenu(false);
             }}
-            title="Notifikasi"
-            className="relative rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+            title="Notifikasi & Agenda"
+            className="relative rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors cursor-pointer"
           >
             <Bell className="h-[17px] w-[17px]" />
-            <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-primary" />
+            {hasNotifications && (
+              <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-primary ring-2 ring-background animate-pulse" />
+            )}
           </button>
 
           {showNotifMenu && (
-            <div className="absolute right-0 mt-2 w-72 rounded-2xl border border-border/60 bg-popover p-3 text-popover-foreground shadow-xl z-50 animate-slide-up">
+            <div className="absolute right-0 mt-2 w-80 rounded-2xl border border-border/60 bg-popover p-3 text-popover-foreground shadow-2xl z-50 animate-slide-up">
               <div className="flex items-center justify-between border-b border-border pb-2 mb-2">
                 <span className="text-xs font-semibold">Notifikasi & Agenda</span>
-                <span className="text-[10px] text-muted-foreground bg-muted px-2 py-0.5 rounded-full">Terbaru</span>
+                <span className="text-[10px] text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+                  {upcomingFollowUps.length + interviewAlerts.length} Agenda
+                </span>
               </div>
-              <div className="flex flex-col gap-2 text-xs">
-                <div className="flex gap-2.5 rounded-lg p-2 hover:bg-muted/50 transition-colors">
-                  <CheckCircle2 className="h-4 w-4 text-emerald-500 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="font-medium text-foreground">Sistem MyJobTrack Siap Pakai</p>
-                    <p className="text-[11px] text-muted-foreground">Pantau seluruh lamaran kerja kamu secara terstruktur.</p>
+
+              <div className="flex flex-col gap-2 text-xs max-h-72 overflow-y-auto">
+                {upcomingFollowUps.map((app) => (
+                  <div
+                    key={`followup-${app.id}`}
+                    onClick={() => {
+                      router.push(`/lamaran?q=${encodeURIComponent(app.company_name)}`);
+                      setShowNotifMenu(false);
+                    }}
+                    className="flex gap-2.5 rounded-xl p-2.5 bg-blue-500/5 hover:bg-blue-500/10 border border-blue-500/20 transition-colors cursor-pointer"
+                  >
+                    <Calendar className="h-4 w-4 text-blue-500 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-semibold text-foreground text-xs">{app.company_name}</p>
+                      <p className="text-[11px] text-muted-foreground">Follow-up: {app.position}</p>
+                      <p className="text-[10px] text-blue-600 dark:text-blue-400 font-medium mt-0.5">
+                        Jadwal: {new Date(app.follow_up_date!).toLocaleDateString("id-ID", { day: "numeric", month: "long" })}
+                      </p>
+                    </div>
                   </div>
-                </div>
+                ))}
+
+                {interviewAlerts.map((app) => (
+                  <div
+                    key={`interview-${app.id}`}
+                    onClick={() => {
+                      router.push(`/lamaran?q=${encodeURIComponent(app.company_name)}`);
+                      setShowNotifMenu(false);
+                    }}
+                    className="flex gap-2.5 rounded-xl p-2.5 bg-amber-500/5 hover:bg-amber-500/10 border border-amber-500/20 transition-colors cursor-pointer"
+                  >
+                    <Briefcase className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-semibold text-foreground text-xs">{app.company_name}</p>
+                      <p className="text-[11px] text-muted-foreground">Tahap Wawancara: {app.position}</p>
+                      <span className="text-[10px] text-amber-600 dark:text-amber-400 font-medium">
+                        Sedang Berjalan
+                      </span>
+                    </div>
+                  </div>
+                ))}
+
+                {!hasNotifications && (
+                  <div className="flex gap-2.5 rounded-xl p-3 bg-muted/40 text-muted-foreground">
+                    <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-medium text-foreground text-xs">Semua Lamaran Terkendali</p>
+                      <p className="text-[11px] text-muted-foreground">Belum ada agenda follow-up mendesak untuk saat ini.</p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}

@@ -23,9 +23,15 @@ export function DasborGreeting() {
     });
   }, []);
 
+  const [greeting, setGreeting] = useState<string>("Selamat Datang");
+
   useEffect(() => {
     function tick() {
       const now = new Date();
+      const hour = now.getHours();
+      setGreeting(
+        hour < 12 ? "Selamat Pagi" : hour < 15 ? "Selamat Siang" : hour < 18 ? "Selamat Sore" : "Selamat Malam"
+      );
       setClock(
         now.toLocaleTimeString("id-ID", {
           hour: "2-digit",
@@ -47,10 +53,6 @@ export function DasborGreeting() {
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
   }, []);
-
-  const hour = new Date().getHours();
-  const greeting =
-    hour < 12 ? "Selamat Pagi" : hour < 15 ? "Selamat Siang" : hour < 18 ? "Selamat Sore" : "Selamat Malam";
 
   return (
     <div>

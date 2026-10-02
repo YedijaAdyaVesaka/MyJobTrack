@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
@@ -16,6 +17,7 @@ interface LamaranFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   initialData?: JobApplication | null;
+  onSuccess?: () => void;
 }
 
 function today() {
@@ -24,12 +26,14 @@ function today() {
 
 function LocationInput({ defaultValue }: { defaultValue?: string }) {
   const [query, setQuery] = React.useState(defaultValue ?? "");
+  const [prevDefault, setPrevDefault] = React.useState(defaultValue);
   const [isOpen, setIsOpen] = React.useState(false);
   const containerRef = React.useRef<HTMLDivElement>(null);
 
-  React.useEffect(() => {
+  if (defaultValue !== prevDefault) {
+    setPrevDefault(defaultValue);
     setQuery(defaultValue ?? "");
-  }, [defaultValue]);
+  }
 
   React.useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -82,27 +86,25 @@ function LocationInput({ defaultValue }: { defaultValue?: string }) {
   );
 }
 
-export function LamaranForm({ open, onOpenChange, initialData }: LamaranFormProps) {
+export function LamaranForm({ open, onOpenChange, initialData, onSuccess }: LamaranFormProps) {
+  const router = useRouter();
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
-  const [selectedStatus, setSelectedStatus] = React.useState<JobStatus>("applied");
+  const [selectedStatus, setSelectedStatus] = React.useState<JobStatus>(initialData?.status ?? "applied");
+  const [prevData, setPrevData] = React.useState(initialData);
   const formRef = React.useRef<HTMLFormElement>(null);
 
-  React.useEffect(() => {
-    if (open) {
-      setError(null);
-      setSelectedStatus(initialData?.status ?? "applied");
-      if (formRef.current) formRef.current.reset();
-    }
-  }, [open, initialData]);
+  if (initialData !== prevData) {
+    setPrevData(initialData);
+    setSelectedStatus(initialData?.status ?? "applied");
+    setError(null);
+  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
     setError(null);
     try {
-
-
       const fd = new FormData(formRef.current!);
       fd.set("status", selectedStatus);
       const res = initialData
@@ -114,9 +116,11 @@ export function LamaranForm({ open, onOpenChange, initialData }: LamaranFormProp
         return;
       }
 
+      router.refresh();
+      onSuccess?.();
       onOpenChange(false);
-    } catch (err: any) {
-      setError(err.message || "Terjadi kesalahan");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Terjadi kesalahan");
     } finally {
       setLoading(false);
     }
@@ -134,7 +138,7 @@ export function LamaranForm({ open, onOpenChange, initialData }: LamaranFormProp
         </div>
       )}
 
-      <form ref={formRef} onSubmit={handleSubmit} className="space-y-5">
+      <form key={initialData ? initialData.id : "new"} ref={formRef} onSubmit={handleSubmit} className="space-y-5">
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
             <Label htmlFor="company_name">Nama Perusahaan *</Label>
@@ -193,6 +197,17 @@ export function LamaranForm({ open, onOpenChange, initialData }: LamaranFormProp
           <div className="space-y-1.5">
             <Label htmlFor="job_url">URL Lowongan</Label>
             <Input id="job_url" name="job_url" type="text" placeholder="https://..." defaultValue={initialData?.job_url ?? ""} />
+          </div>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-1.5">
+            <Label htmlFor="salary_range">Perkiraan Gaji</Label>
+            <Input id="salary_range" name="salary_range" placeholder="Contoh: Rp 8.000.000 - 12.000.000" defaultValue={initialData?.salary_range ?? ""} />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="follow_up_date">Tanggal Follow-up / Jadwal Berikutnya</Label>
+            <Input id="follow_up_date" name="follow_up_date" type="date" defaultValue={initialData?.follow_up_date ?? ""} />
           </div>
         </div>
 

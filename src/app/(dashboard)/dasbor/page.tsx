@@ -36,8 +36,15 @@ export default async function DasborPage() {
   ];
 
   const recent = applications.slice(0, 5);
+  const todayMidnight = new Date();
+  todayMidnight.setHours(0, 0, 0, 0);
+
   const upcomingFollowUps = applications
-    .filter((a) => a.follow_up_date && new Date(a.follow_up_date) >= new Date())
+    .filter((a) => {
+      if (!a.follow_up_date) return false;
+      const d = new Date(a.follow_up_date);
+      return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime() >= todayMidnight.getTime();
+    })
     .sort((a, b) => new Date(a.follow_up_date!).getTime() - new Date(b.follow_up_date!).getTime())
     .slice(0, 5);
 

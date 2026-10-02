@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { getApplications } from "@/lib/actions";
 import { LamaranTable } from "@/components/lamaran-table";
 
@@ -14,7 +15,9 @@ export default async function LamaranPage() {
           Kelola semua lamaran kerja kamu di sini.
         </p>
       </div>
-      <LamaranTable data={data} />
+      <Suspense fallback={<div className="p-8 text-center text-muted-foreground text-sm">Memuat data lamaran...</div>}>
+        <LamaranTable data={data} />
+      </Suspense>
     </div>
   );
 }

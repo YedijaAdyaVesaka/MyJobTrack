@@ -54,6 +54,8 @@ export async function createApplication(formData: FormData): Promise<{ success: 
     const status = (formData.get("status") as JobStatus) || "applied";
     const source = (formData.get("source") as string || "").trim() || null;
     let job_url = (formData.get("job_url") as string || "").trim() || null;
+    const salary_range = (formData.get("salary_range") as string || "").trim() || null;
+    const follow_up_date = (formData.get("follow_up_date") as string || "").trim() || null;
     const notes = (formData.get("notes") as string || "").trim() || null;
 
     if (!company_name || !position || !applied_date) {
@@ -73,6 +75,8 @@ export async function createApplication(formData: FormData): Promise<{ success: 
       status,
       source,
       job_url,
+      salary_range,
+      follow_up_date,
       notes,
     });
 
@@ -83,9 +87,13 @@ export async function createApplication(formData: FormData): Promise<{ success: 
 
     revalidatePath("/lamaran");
     revalidatePath("/dasbor");
+    revalidatePath("/kanban");
+    revalidatePath("/statistik");
+    revalidatePath("/pengaturan");
     return { success: true };
-  } catch (err: any) {
-    return { success: false, error: err.message || "Gagal menambah lamaran." };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Gagal menambah lamaran.";
+    return { success: false, error: message };
   }
 }
 
@@ -102,6 +110,8 @@ export async function updateApplication(id: string, formData: FormData): Promise
     const status = formData.get("status") as JobStatus;
     const source = (formData.get("source") as string || "").trim() || null;
     let job_url = (formData.get("job_url") as string || "").trim() || null;
+    const salary_range = (formData.get("salary_range") as string || "").trim() || null;
+    const follow_up_date = (formData.get("follow_up_date") as string || "").trim() || null;
     const notes = (formData.get("notes") as string || "").trim() || null;
 
     if (!company_name || !position || !applied_date) {
@@ -122,6 +132,8 @@ export async function updateApplication(id: string, formData: FormData): Promise
         status,
         source,
         job_url,
+        salary_range,
+        follow_up_date,
         notes,
       })
       .eq("id", id);
@@ -133,9 +145,13 @@ export async function updateApplication(id: string, formData: FormData): Promise
 
     revalidatePath("/lamaran");
     revalidatePath("/dasbor");
+    revalidatePath("/kanban");
+    revalidatePath("/statistik");
+    revalidatePath("/pengaturan");
     return { success: true };
-  } catch (err: any) {
-    return { success: false, error: err.message || "Gagal mengubah lamaran." };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Gagal mengubah lamaran.";
+    return { success: false, error: message };
   }
 }
 
@@ -151,9 +167,13 @@ export async function deleteApplication(id: string): Promise<{ success: boolean;
 
     revalidatePath("/lamaran");
     revalidatePath("/dasbor");
+    revalidatePath("/kanban");
+    revalidatePath("/statistik");
+    revalidatePath("/pengaturan");
     return { success: true };
-  } catch (err: any) {
-    return { success: false, error: err.message || "Gagal menghapus lamaran." };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Gagal menghapus lamaran.";
+    return { success: false, error: message };
   }
 }
 
@@ -169,8 +189,12 @@ export async function updateApplicationStatus(id: string, status: JobStatus): Pr
 
     revalidatePath("/lamaran");
     revalidatePath("/dasbor");
+    revalidatePath("/kanban");
+    revalidatePath("/statistik");
+    revalidatePath("/pengaturan");
     return { success: true };
-  } catch (err: any) {
-    return { success: false, error: err.message || "Gagal mengubah status lamaran." };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Gagal mengubah status lamaran.";
+    return { success: false, error: message };
   }
 }
