@@ -4,6 +4,7 @@ import * as React from "react";
 import { User, Download, ShieldCheck, Database } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { JobApplication } from "@/lib/types";
+import { exportApplicationsToCSV } from "@/lib/export-csv";
 
 export function PengaturanView({
   userEmail,
@@ -12,36 +13,6 @@ export function PengaturanView({
   userEmail: string;
   applications: JobApplication[];
 }) {
-  function exportCSV() {
-    if (applications.length === 0) {
-      alert("Belum ada data lamaran untuk diexport.");
-      return;
-    }
-
-    const headers = ["Perusahaan", "Posisi", "Lokasi", "Tanggal Melamar", "Status", "Sumber", "Range Gaji", "Follow-up", "URL Lowongan", "Catatan"];
-    const rows = applications.map((a) => [
-      `"${a.company_name.replace(/"/g, '""')}"`,
-      `"${a.position.replace(/"/g, '""')}"`,
-      `"${(a.location || "").replace(/"/g, '""')}"`,
-      `"${a.applied_date}"`,
-      `"${a.status}"`,
-      `"${(a.source || "").replace(/"/g, '""')}"`,
-      `"${(a.salary_range || "").replace(/"/g, '""')}"`,
-      `"${(a.follow_up_date || "").replace(/"/g, '""')}"`,
-      `"${(a.job_url || "").replace(/"/g, '""')}"`,
-      `"${(a.notes || "").replace(/"/g, '""')}"`,
-    ]);
-
-    const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + [headers.join(","), ...rows.map((e) => e.join(","))].join("\n");
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `myjobtrack_lamaran_${new Date().toISOString().split("T")[0]}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  }
-
   return (
     <div className="space-y-6 max-w-4xl">
       <div>
@@ -82,7 +53,12 @@ export function PengaturanView({
         </p>
 
         <div className="pt-2">
-          <Button onClick={exportCSV} variant="outline" className="gap-2 rounded-xl">
+          <Button
+            onClick={() => exportApplicationsToCSV(applications)}
+            variant="outline"
+            className="gap-2 rounded-xl cursor-pointer"
+            aria-label="Unduh file cadangan CSV"
+          >
             <Download className="h-4 w-4" /> Ekspor Data (CSV)
           </Button>
         </div>

@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Plus, Pencil, Trash2, ExternalLink, X, Search, Calendar, DollarSign, Clock } from "lucide-react";
+import { Plus, Pencil, Trash2, ExternalLink, X, Search, Calendar, DollarSign, Clock, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { LamaranForm } from "@/components/lamaran-form";
@@ -11,6 +11,7 @@ import type { JobApplication } from "@/lib/types";
 import { STATUS_OPTIONS, STATUS_COLORS } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { StatusBadge } from "@/components/ui/status-badge";
+import { exportApplicationsToCSV } from "@/lib/export-csv";
 
 interface LamaranTableProps {
   data: JobApplication[];
@@ -86,9 +87,21 @@ export function LamaranTable({ data }: LamaranTableProps) {
               </button>
             )}
           </div>
-          <Button onClick={() => { setEditItem(null); setFormOpen(true); }} className="shrink-0 cursor-pointer">
-            <Plus className="h-4 w-4 mr-1.5" /> Tambah Lamaran
-          </Button>
+          <div className="flex items-center gap-2 shrink-0">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => exportApplicationsToCSV(filtered)}
+              className="gap-1.5 cursor-pointer"
+              title="Ekspor data lamaran ke file CSV"
+              aria-label="Ekspor data lamaran ke file CSV"
+            >
+              <Download className="h-4 w-4" /> Ekspor CSV
+            </Button>
+            <Button onClick={() => { setEditItem(null); setFormOpen(true); }} className="cursor-pointer">
+              <Plus className="h-4 w-4 mr-1.5" /> Tambah Lamaran
+            </Button>
+          </div>
         </div>
 
         {/* Filter Pills */}
