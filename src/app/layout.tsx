@@ -6,11 +6,24 @@ import "./globals.css";
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "MyJobTrack — Lacak Lamaran Kerja",
+  metadataBase: new URL("https://my-job-track.vercel.app"),
+  title: {
+    default: "MyJobTrack — Lacak Lamaran Kerja",
+    template: "%s | MyJobTrack",
+  },
   description: "Catat, pantau, dan analisis progres lamaran kerja kamu di satu tempat.",
+  openGraph: {
+    title: "MyJobTrack — Lacak Lamaran Kerja",
+    description: "Catat, pantau, dan analisis progres lamaran kerja kamu di satu tempat.",
+    url: "https://my-job-track.vercel.app",
+    siteName: "MyJobTrack",
+    locale: "id_ID",
+    type: "website",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

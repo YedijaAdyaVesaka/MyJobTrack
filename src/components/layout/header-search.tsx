@@ -122,6 +122,7 @@ export function HeaderSearch() {
               }}
               className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-foreground cursor-pointer"
               title={query ? "Kosongkan" : "Tutup"}
+              aria-label={query ? "Kosongkan pencarian" : "Tutup pencarian"}
             >
               <X className="h-3.5 w-3.5" />
             </button>
@@ -192,6 +193,7 @@ export function HeaderSearch() {
             setTimeout(() => inputRef.current?.focus(), 50);
           }}
           title="Cari lamaran (Ctrl+K)"
+          aria-label="Cari lamaran (Ctrl+K)"
           className="flex items-center gap-2 rounded-xl border border-input/60 bg-muted/40 px-2.5 py-1 text-xs text-muted-foreground hover:bg-muted hover:text-foreground transition-all cursor-pointer shadow-2xs"
         >
           <Search className="h-3.5 w-3.5" />

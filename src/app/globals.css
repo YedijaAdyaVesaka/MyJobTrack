@@ -16,9 +16,9 @@
 
   --border: 220 13% 91%;
   --input: 220 13% 91%;
-  --ring: 217 91% 60%;
+  --ring: 221.2 83.2% 53.3%;
 
-  --primary: 217 91% 60%;
+  --primary: 221.2 83.2% 53.3%;
   --primary-foreground: 0 0% 100%;
 
   --secondary: 220 14% 96%;
@@ -30,7 +30,7 @@
   --destructive: 0 72% 51%;
   --destructive-foreground: 0 0% 100%;
 
-  --success: 142 71% 40%;
+  --success: 142 71% 32%;
   --success-foreground: 0 0% 100%;
   --warning: 38 92% 50%;
   --warning-foreground: 24 10% 10%;

@@ -4,7 +4,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       {/* Decorative gradient blobs */}
       <div className="pointer-events-none absolute -top-32 -left-32 h-[420px] w-[420px] rounded-full bg-primary/10 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-24 -right-24 h-[340px] w-[340px] rounded-full bg-primary/5 blur-3xl" />
-      <div className="relative z-10 animate-slide-up">{children}</div>
+      <main className="relative z-10 w-full max-w-sm animate-slide-up">{children}</main>
     </div>
   );
 }

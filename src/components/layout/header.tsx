@@ -102,6 +102,7 @@ export function Header({ title }: { title?: string }) {
         <button
           onClick={toggleSidebar}
           title={isCollapsed ? "Buka Sidebar" : "Tutup Sidebar"}
+          aria-label={isCollapsed ? "Buka Sidebar" : "Tutup Sidebar"}
           className="max-md:hidden md:flex items-center justify-center rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors cursor-pointer"
         >
           <PanelLeft className="h-4 w-4" />
@@ -120,6 +121,7 @@ export function Header({ title }: { title?: string }) {
               setShowUserMenu(false);
             }}
             title="Notifikasi & Agenda"
+            aria-label="Notifikasi & Agenda"
             className="relative rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors cursor-pointer"
           >
             <Bell className="h-[17px] w-[17px]" />
@@ -202,6 +204,7 @@ export function Header({ title }: { title?: string }) {
               setShowUserMenu(!showUserMenu);
               setShowNotifMenu(false);
             }}
+            aria-label="Menu Pengguna"
             className="ml-1 flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary/70 text-xs font-semibold text-primary-foreground shadow-sm transition-all duration-200 hover:scale-105 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
           >
             {initial}

@@ -25,7 +25,8 @@ export function Dialog({ open, onOpenChange, children }: DialogProps) {
       <div className="relative z-50 w-[95vw] sm:w-full max-w-2xl max-h-[85vh] sm:max-h-[90vh] overflow-y-auto rounded-2xl border bg-background p-5 sm:p-8 shadow-xl my-auto animate-slide-up">
         <button
           onClick={() => onOpenChange(false)}
-          className="absolute right-4 top-4 rounded-full p-1 opacity-60 hover:opacity-100 hover:bg-muted transition-all"
+          aria-label="Tutup dialog"
+          className="absolute right-4 top-4 rounded-full p-1 opacity-60 hover:opacity-100 hover:bg-muted transition-all cursor-pointer"
         >
           <X className="h-4 w-4" />
         </button>
